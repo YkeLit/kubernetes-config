@@ -1,0 +1,60 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: minio-api-websecure
+  namespace: minio
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: (Host(`minio-api.apps.jet.work`)) && PathPrefix(`/`)
+    services:
+    - name: minio
+      port: minio-api
+  tls:
+    certResolver: jet
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: minio-api-web
+  namespace: minio
+spec:
+  entryPoints:
+  - web
+  routes:
+  - kind: Rule
+    match: (Host(`minio-api.apps.jet.work`)) && PathPrefix(`/`)
+    middlewares:
+    - name: minio-redirect-to-https
+    services:
+    - name: minio
+      port: minio-api
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: minio-redirect-to-https
+  namespace: minio
+spec:
+  redirectScheme:
+    permanent: true
+    scheme: https
+# ---
+# apiVersion: traefik.containo.us/v1alpha1
+# kind: IngressRoute
+# metadata:
+#   name: minio-websecure
+#   namespace: minio
+# spec:
+#   entryPoints:
+#   - websecure
+#   routes:
+#   - kind: Rule
+#     match: (Host(`minio.apps.jet.work`)) && PathPrefix(`/`)
+#     services:
+#     - name: minio
+#       port: minio-console
+#   tls:
+#     certResolver: jet

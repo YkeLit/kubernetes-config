@@ -1,0 +1,41 @@
+global:
+  storageClass: "nfs-storage"
+
+image:
+  registry: docker.io
+  repository: bitnami/minio
+  tag: 2023.5.4-debian-11-r1
+  pullPolicy: IfNotPresent
+
+mode: standalone
+
+auth:
+  rootUser: jet
+  rootPassword: ZDhmM2IwZGViMjA0MTc0
+
+defaultBuckets: minio-private
+
+containerPorts:
+  api: 9000
+  console: 9001
+
+service:
+  type: ClusterIP
+  ports:
+    api: 9000
+    console: 9001
+
+persistence:
+  enabled: true
+  mountPath: /data
+  accessModes:
+    - ReadWriteOnce
+  size: 10Gi
+
+buckets:
+  - name: test
+    policy: public
+  - name: dev
+    policy: public
+  - name: public
+    policy: none
