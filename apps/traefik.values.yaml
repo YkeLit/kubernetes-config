@@ -104,9 +104,9 @@ env:
   - name: TZ
     value: Asia/Shanghai
   - name: ALICLOUD_ACCESS_KEY
-    value: LTAI5tGiD969DEStwwuHP4HW
+    value: LTAI569DEStwwuHP4HW
   - name: ALICLOUD_SECRET_KEY
-    value: xuOfzGyaJLFBIQGVsJFwKSgCGpP7Qt
+    value: xuOfzVsJFwKSgCGpP7Qt
 envFrom: []
 ports:
   traefik:
