@@ -1,0 +1,39 @@
+image:
+  repository: velero/velero
+  tag: v1.11.0
+  pullPolicy: IfNotPresent
+  imagePullSecrets: []
+podAnnotations: {}
+initContainers:
+  - name: velero-plugin-for-aws
+    image: velero/velero-plugin-for-aws:v1.7.0
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+affinity: {}
+nodeSelector: {}
+cleanUpCRDs: true
+configuration:
+  backupStorageLocation:
+  - name: postgresql
+    provider: aws
+    bucket: jet-buckup
+    prefix: postgresql
+    config:
+      region: minio
+      s3ForcePathStyle: true
+      s3Url: http://test-minio.test.svc.cluster.local:9000
+  - name: minio
+    provider: aws
+    bucket: jet-buckup
+    prefix: minio
+    config:
+      region: minio
+      s3ForcePathStyle: true
+      s3Url: http://test-minio.test.svc.cluster.local:9000
+  volumeSnapshotLocation:
+  - name: volume-snapshot
+    provider: aws
+    config:
+      region: minio

@@ -1,0 +1,202 @@
+image:
+  registry: docker.io
+  repository: traefik
+  tag: ""
+  pullPolicy: IfNotPresent
+hub:
+  enabled: false
+deployment:
+  enabled: true
+  kind: Deployment
+  replicas: 1
+  terminationGracePeriodSeconds: 60
+  minReadySeconds: 0
+  annotations: {}
+  labels: {}
+  podAnnotations: {}
+  podLabels: {}
+  additionalContainers: []
+  additionalVolumes: []
+  initContainers: []
+  shareProcessNamespace: false
+  dnsConfig: {}
+  imagePullSecrets: []
+  lifecycle: {}
+podDisruptionBudget:
+  enabled: false
+ingressClass:
+  enabled: true
+  isDefaultClass: true
+experimental:
+  v3:
+    enabled: false
+  plugins:
+    enabled: false
+  kubernetesGateway:
+    enabled: false
+    gateway:
+      enabled: true
+ingressRoute:
+  dashboard:
+    enabled: true
+    annotations: {}
+    labels: {}
+    matchRule: PathPrefix(`/dashboard`) || PathPrefix(`/api`)
+    entryPoints: ["traefik"]
+    middlewares: []
+    tls: {}
+updateStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 0
+    maxSurge: 1
+readinessProbe:
+  failureThreshold: 1
+  initialDelaySeconds: 2
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 2
+livenessProbe:
+  failureThreshold: 3
+  initialDelaySeconds: 2
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 2
+providers:
+  kubernetesCRD:
+    enabled: true
+    allowCrossNamespace: false
+    allowExternalNameServices: true
+    allowEmptyServices: false
+    namespaces: []
+  kubernetesIngress:
+    enabled: true
+    allowExternalNameServices: false
+    allowEmptyServices: false
+    namespaces: []
+    publishedService:
+      enabled: false
+volumes: []
+additionalVolumeMounts: []
+logs:
+  general:
+    level: ERROR
+  access:
+    enabled: true
+    filePath: "/var/log/traefik/access.log"
+    filters: {}
+    fields:
+      general:
+        defaultmode: keep
+        names: {}
+      headers:
+        defaultmode: drop
+        names: {}
+metrics:
+  prometheus:
+    entryPoint: metrics
+tracing: {}
+globalArguments:
+  - "--global.checknewversion"
+  - "--global.sendanonymoususage"
+additionalArguments: []
+env:
+  - name: TZ
+    value: Asia/Shanghai
+  - name: ALICLOUD_ACCESS_KEY
+    value: LTAI569DEStwwuHP4HW
+  - name: ALICLOUD_SECRET_KEY
+    value: xuOfzVsJFwKSgCGpP7Qt
+envFrom: []
+ports:
+  traefik:
+    port: 9000
+    expose: false
+    exposedPort: 9000
+    protocol: TCP
+  web:
+    port: 8000
+    expose: true
+    exposedPort: 80
+    protocol: TCP
+    nodePort: 80
+    forwardedHeaders:
+      insecure: true
+  websecure:
+    port: 8443
+    expose: true
+    exposedPort: 443
+    protocol: TCP
+    nodePort: 443
+    http3:
+      enabled: false
+    forwardedHeaders:
+     insecure: true
+    tls:
+      enabled: true
+      options: ""
+      certResolver: "jet"
+      domains: []
+    middlewares: []
+  metrics:
+    port: 9100
+    expose: false
+    exposedPort: 9100
+    protocol: TCP
+tlsOptions: {}
+tlsStore: {}
+service:
+  enabled: true
+  single: true
+  type: LoadBalancer
+  annotations: {}
+  annotationsTCP: {}
+  annotationsUDP: {}
+  labels: {}
+  spec: {}
+  loadBalancerSourceRanges: []
+  externalIPs: []
+autoscaling:
+  enabled: false
+persistence:
+  enabled: false
+  name: data
+  accessMode: ReadWriteOnce
+  size: 128Mi
+  path: /data
+  annotations: {}
+certResolvers:
+  jet:
+    email: certificate-applicant@skylark.onaliyun.com
+    dnsChallenge:
+      provider: alidns
+      delayBeforeCheck: 30
+      resolvers:
+        - 1.1.1.1
+        - 8.8.8.8
+    storage: /data/acme.json
+hostNetwork: false
+rbac:
+  enabled: true
+  namespaced: false
+podSecurityPolicy:
+  enabled: false
+serviceAccount:
+  name: ""
+serviceAccountAnnotations: {}
+resources: {}
+affinity: {}
+nodeSelector: {}
+tolerations: []
+topologySpreadConstraints: []
+priorityClassName: ""
+securityContext:
+  capabilities:
+    drop: [ALL]
+  readOnlyRootFilesystem: true
+podSecurityContext:
+  fsGroupChangePolicy: "OnRootMismatch"
+  runAsGroup: 65532
+  runAsNonRoot: true
+  runAsUser: 65532
+extraObjects: []

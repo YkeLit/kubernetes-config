@@ -1,0 +1,84 @@
+fullnameOverride: ts-postgresql
+nameOverride: ts-postgresql
+architecture: standalone
+auth:
+  enablePostgresUser: true
+  postgresPassword: 9cJuF6Br5MkLFxTBmvZo
+common:
+  exampleValue: common-chart
+  global:
+    postgresql:
+      auth:
+        database: postgres
+        postgresPassword: 9cJuF6Br5MkLFxTBmvZo
+    storageClass: nfs-storage
+global:
+  postgresql:
+    auth:
+      database: postgres
+      postgresPassword: 9cJuF6Br5MkLFxTBmvZo
+  storageClass: nfs-storage
+image:
+  tag: 14.8.0-debian-11-r13
+metrics:
+  enabled: true
+postgresqlDataDir: /bitnami/postgresql/data
+postgresqlSharedPreloadLibraries: pgaudit
+primary:
+  configuration: ""
+  containerSecurityContext:
+    enabled: true
+    runAsUser: 1001
+  extendedConfiguration: |
+    max_connections = 50
+    shared_buffers = 512MB
+    effective_cache_size = 1536MB
+    maintenance_work_mem = 128MB
+    checkpoint_completion_target = 0.9
+    wal_buffers = 16MB
+    default_statistics_target = 100
+    random_page_cost = 1.1
+    effective_io_concurrency = 200
+    work_mem = 13107kB
+    min_wal_size = 1GB
+    max_wal_size = 4GB
+  initdb:
+    args: ""
+    password: 9cJuF6Br5MkLFxTBmvZo
+    scripts:
+      init-db.sh: |
+        #!/bin/bash
+        set -e
+
+        psql -v ON_ERROR_STOP=1 --username "postgres" --dbname "postgres" <<-EOSQL
+        CREATE DATABASE airbase_prod;
+        CREATE DATABASE eventstore_prod;
+        EOSQL
+    user: postgres
+  name: production
+  nodeAffinityPreset:
+    key: kubernetes.io/hostname
+    type: soft
+    values:
+    - k8s-worker1
+  persistence:
+    accessModes:
+    - ReadWriteOnce
+    enabled: true
+    mountPath: /bitnami/postgresql
+    size: 5Gi
+    storageClass: nfs-storage
+  pgHbaConfiguration: |-
+    local   all             all                                     trust
+    host    all             all             127.0.0.1/32            trust
+    host    all             all             ::1/128                 trust
+    host    all             all             all                     scram-sha-256
+  podAntiAffinityPreset: soft
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+shmVolume:
+  enabled: true
+  sizeLimit: 2Gi
+

@@ -1,41 +1,75 @@
-global:
-  storageClass: "nfs-storage"
-
-image:
-  registry: docker.io
-  repository: bitnami/minio
-  tag: 2023.5.4-debian-11-r1
-  pullPolicy: IfNotPresent
-
-mode: standalone
-
+fullnameOverride: test-minio
+nameOverride: test-minio
+ingress:
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: jet
+  enabled: true
+  hostname: test-con.apps.jet.work
+  ingressClassName: "traefik"
+  path: /
+  pathType: Prefix
+  servicePort: minio-console
+  tls: true
+apiIngress:
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: jet
+  enabled: true
+  hostname: test-minio.apps.jet.work
+  ingressClassName: traefik
+  path: /
+  pathType: Prefix
+  servicePort: minio-api
+  tls: true
 auth:
-  rootUser: jet
   rootPassword: ZDhmM2IwZGViMjA0MTc0
-
-defaultBuckets: minio-private
-
-containerPorts:
-  api: 9000
-  console: 9001
-
-service:
-  type: ClusterIP
-  ports:
-    api: 9000
-    console: 9001
-
+  rootUser: admin
+clientImage:
+  tag: 2023.5.4-debian-11-r1
+extraVolumeMounts: []
+extraVolumes: []
+global:
+  storageClass: nfs-storage
+image:
+  tag: 2023.5.4-debian-11-r1
+mode: standalone
+nodeAffinityPreset:
+  key: kubernetes.io/hostname
+  type: soft
+  values:
+  - k8s-worker1
 persistence:
+  accessModes:
+  - ReadWriteOnce
   enabled: true
   mountPath: /data
-  accessModes:
-    - ReadWriteOnce
-  size: 10Gi
+  size: 8Gi
+  storageClass: nfs-storage
+podAnnotations:
+  prometheus.io/path: /minio/v2/metrics/cluster
+  prometheus.io/port: "9000"
+  prometheus.io/scrape: "true"
+provisioning:
+  command:
+  - /bin/sh
+  - -c
+  - >-
+    set -e;
+    echo "Start Minio provisioning";
+    
+    mc alias set provisioning $MINIO_SCHEME://test-minio:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD;
+    
+    setup_bucket() {
+      mc mb provisioning/$1 --ignore-existing;
+    };
 
-buckets:
-  - name: test
-    policy: public
-  - name: dev
-    policy: public
-  - name: public
-    policy: none
+    setup_bucket minio-public;
+    setup_bucket minio-private;
+    mc anonymous set download provisioning/minio-public;
+
+    echo "End Minio provisioning";
+  enabled: true
+
