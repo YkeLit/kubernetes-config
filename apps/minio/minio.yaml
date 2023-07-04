@@ -52,24 +52,71 @@ podAnnotations:
   prometheus.io/path: /minio/v2/metrics/cluster
   prometheus.io/port: "9000"
   prometheus.io/scrape: "true"
+# provisioning:
+#   command:
+#   - /bin/sh
+#   - -c
+#   - >-
+#     set -e;
+#     echo "Start Minio provisioning";
+#     
+#     mc alias set provisioning $MINIO_SCHEME://test-minio:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD;
+#     
+#     setup_bucket() {
+#       mc mb provisioning/$1 --ignore-existing;
+#     };
+# 
+#     setup_bucket minio-public;
+#     setup_bucket minio-private;
+#     mc anonymous set download provisioning/minio-public;
+# 
+#     echo "End Minio provisioning";
+#   enabled: true
 provisioning:
-  command:
-  - /bin/sh
-  - -c
-  - >-
-    set -e;
-    echo "Start Minio provisioning";
-    
-    mc alias set provisioning $MINIO_SCHEME://test-minio:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD;
-    
-    setup_bucket() {
-      mc mb provisioning/$1 --ignore-existing;
-    };
-
-    setup_bucket minio-public;
-    setup_bucket minio-private;
-    mc anonymous set download provisioning/minio-public;
-
-    echo "End Minio provisioning";
+  extraCommands:
+  - mc anonymous set download provisioning/minio-public
   enabled: true
-
+  policies:
+    - name: backup
+      statements:
+        - resources:
+            - "arn:aws:s3:::postgresql-backup/*"
+          actions:
+            - "s3:DeleteObject"
+            - "s3:GetObject"
+            - "s3:GetBucketLocation"
+            - "s3:ListBucket"
+            - "s3:ListAllMyBuckets"
+          effect: "Allow"
+    - name: jet
+      statements:
+        - resources:
+            - "arn:aws:s3:::minio-public/*"
+            - "arn:aws:s3:::minio-private/*"
+          actions:
+            - "s3:DeleteObject"
+            - "s3:GetObject"
+            - "s3:GetBucketLocation"
+            - "s3:ListBucket"
+            - "s3:ListAllMyBuckets"
+          effect: "Allow"
+  users:
+    - username: backup-man
+      password: AAqEqVsInV4SoYWSgHyL7C+VlJc=
+      disable: false
+      policies:
+        - backup
+      setPolicies: true
+    - username: jet
+      password: LCgYcZor/5chU2RTo9bN/CJ10qM=
+      disable: false
+      policies:
+        - jet
+      setPolicies: true
+  buckets:
+    - name: postgresql-backup
+      region: minio
+    - name: minio-public
+      region: minio
+    - name: minio-private
+      region: minio
