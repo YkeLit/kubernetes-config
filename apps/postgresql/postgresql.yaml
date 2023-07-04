@@ -78,6 +78,10 @@ primary:
     requests:
       cpu: 250m
       memory: 256Mi
+  tolerations:
+  - effect: NoExecute
+    key: jet.node/test-session
+    operator: Equal
 shmVolume:
   enabled: true
   sizeLimit: 2Gi
