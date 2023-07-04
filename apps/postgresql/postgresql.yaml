@@ -82,6 +82,38 @@ primary:
   - effect: NoExecute
     key: jet.node/test-session
     operator: Equal
+  affinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - preference:
+          matchExpressions:
+          - key: node.cpu
+            operator: Gt
+            values:
+            - "16"
+        weight: 10
+      - preference:
+          matchExpressions:
+          - key: node.memeory
+            operator: Gt
+            values:
+            - "64"
+        weight: 20
+      - preference:
+          matchExpressions:
+          - key: node.disk
+            operator: Gt
+            values:
+            - "400"
+        weight: 25
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+            - worker1
+            - worker2
 shmVolume:
   enabled: true
   sizeLimit: 2Gi
