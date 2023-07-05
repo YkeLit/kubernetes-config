@@ -37,3 +37,16 @@ configuration:
     provider: aws
     config:
       region: minio
+credentials:
+  name: velero
+  secretContents:
+    cloud: |
+      [default]
+      aws_access_key_id = backup-man
+      aws_secret_access_key = AAqEqVsInV4SoYWSgHyL7C+VlJc=
+  useSecret: true
+  defaultBackupTTL: null
+snapshotsEnabled: true
+upgradeCRDs: true
+deployNodeAgent: true
+backupsEnabled: true
