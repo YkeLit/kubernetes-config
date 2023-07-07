@@ -37,6 +37,8 @@ configuration:
     provider: aws
     config:
       region: minio
+  extraEnvVars:
+    TZ: Asia/Shanghai
 credentials:
   name: velero
   secretContents:
