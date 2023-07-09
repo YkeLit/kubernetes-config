@@ -11,6 +11,12 @@ initContainers:
     volumeMounts:
       - mountPath: /target
         name: plugins
+  - name: velero-plugin-for-csi
+    image: velero/velero-plugin-for-csi:v0.5.0
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
 affinity: {}
 nodeSelector: {}
 cleanUpCRDs: true
@@ -18,20 +24,12 @@ configuration:
   backupStorageLocation:
   - name: postgresql
     provider: aws
-    bucket: jet-buckup
+    bucket: backup
     prefix: postgresql
     config:
       region: minio
       s3ForcePathStyle: true
-      s3Url: http://test-minio.test.svc.cluster.local:9000
-  - name: minio
-    provider: aws
-    bucket: jet-buckup
-    prefix: minio
-    config:
-      region: minio
-      s3ForcePathStyle: true
-      s3Url: http://test-minio.test.svc.cluster.local:9000
+      s3Url: http://minio.minio.svc.cluster.local:9000
   volumeSnapshotLocation:
   - name: volume-snapshot
     provider: aws
