@@ -52,8 +52,8 @@ kubectl certificate approve $user_name
 kubectl get csr $user_name -o jsonpath='{.status.certificate}'| base64 -d > "$file_name_prefix".crt
 
 # 创建角色和角色绑定
-sed "s/example/$user_name" example-cluster-role.yaml > "$file_name_prefix"-cluster-role.yaml
-sed "s/example/$user_name" example-cluster-rolebinding.yaml > "$file_name_prefix"-cluster-rolebinding.yaml
+sed "s/example/$user_name/" example-cluster-role.yaml > "$file_name_prefix"-cluster-role.yaml
+sed "s/example/$user_name/" example-cluster-rolebinding.yaml > "$file_name_prefix"-cluster-rolebinding.yaml
 kubectl apply -f "$file_name_prefix"-cluster-role.yaml
 kubectl apply -f "$file_name_prefix"-cluster-rolebinding.yaml
 
