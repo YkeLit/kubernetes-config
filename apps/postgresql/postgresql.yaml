@@ -12,12 +12,6 @@ common:
         database: postgres
         postgresPassword: 9cJuF6Br5MkLFxTBmvZo
     storageClass: nfs-storage
-global:
-  postgresql:
-    auth:
-      database: postgres
-      postgresPassword: 9cJuF6Br5MkLFxTBmvZo
-  storageClass: nfs-storage
 image:
   tag: 14.8.0-debian-11-r13
 metrics:
