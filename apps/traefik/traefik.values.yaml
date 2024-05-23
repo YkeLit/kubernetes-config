@@ -15,7 +15,7 @@ logs:
     filePath: "/opt/data/access.log"
 additionalArguments:
   - "--api.insecure=true"
-  - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+#   - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
   - "--log.filePath=/opt/data/traefik.log"
 env:
   - name: TZ
